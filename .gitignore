@@ -1,0 +1,16 @@
+DerivedDataCache
+Intermediate
+Saved
+Plugins/Developer
+.vscode
+.vs
+.idea
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+*.pdb

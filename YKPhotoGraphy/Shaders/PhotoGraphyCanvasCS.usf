@@ -1,0 +1,87 @@
+// Custom SceneViewExtension Template for Unreal Engine
+// Copyright 2023 - 2025 Ossi Luoto
+// 
+// Custom CS PostProcessing Shader
+
+#include "/Engine/Public/Platform.ush"
+#include "/Engine/Private/Common.ush"
+#include "/Engine/Private/ScreenPass.ush"
+
+// Shader parameters
+
+// SceneColor texture
+Texture2D OriginalSceneColor;
+
+// SceneColor Viewport parameters
+SCREEN_PASS_TEXTURE_VIEWPORT(SceneColorViewport)
+
+float2 ViewCanvas_CanvasOffset;
+float2 ViewCanvas_CanvasZoom;
+float  ViewCanvas_CanvasRotation;
+
+// Output
+RWTexture2D<float4> Output;
+
+float2 RotateUV(float2 uv, float angle, float Aspect = 1.0f , float2 Pivot = float2(0.5, 0.5))
+{
+	float s = sin(angle);
+	float c = cos(angle);
+	
+	// Translate UV to pivot
+	uv -= Pivot;
+
+	uv.x *= Aspect; // Fix aspect ratio distortion
+	
+	// Rotate UV
+	float2 rotatedUV;
+	rotatedUV.x = uv.x * c - uv.y * s;
+	rotatedUV.y = uv.x * s + uv.y * c;
+
+	rotatedUV.x /= Aspect; // Fix aspect ratio distortion
+	
+	// Translate UV back
+	rotatedUV += Pivot;
+	
+	return rotatedUV;
+}
+
+[numthreads(THREADS_X, THREADS_Y, THREADS_Z)]
+void MainCS(uint2 DispatchThreadId : SV_DispatchThreadID)
+{
+	// Check that we are in scope
+	if (any(DispatchThreadId >= SceneColorViewport_ViewportMax))
+	{
+		return;
+	}
+
+	float Aspect = SceneColorViewport_ViewportSize.x / SceneColorViewport_ViewportSize.y;
+	Aspect *= ViewCanvas_CanvasZoom.x / ViewCanvas_CanvasZoom.y;
+	
+	// float2 UV_01 = (DispatchThreadId + 0.5) * SceneColorViewport_ExtentInverse;
+	float2 UV_01 = (DispatchThreadId + 0.5) * SceneColorViewport_ViewportSizeInverse;
+	float2 NormalizedUV = UV_01 - 0.5;
+	float2 CanvasUV = NormalizedUV;
+	CanvasUV -= ViewCanvas_CanvasOffset;
+	CanvasUV /= ViewCanvas_CanvasZoom;
+	CanvasUV = RotateUV(CanvasUV, -ViewCanvas_CanvasRotation, Aspect, 0.0f);
+	CanvasUV += 0.5;
+	CanvasUV *= SceneColorViewport_ViewportSize / SceneColorViewport_Extent;
+	
+	if (any(CanvasUV >= SceneColorViewport_UVViewportMax) || any(CanvasUV < SceneColorViewport_UVViewportMin))
+	{
+		Output[SceneColorViewport_ViewportMin + DispatchThreadId] = float4(0,0,0,1);
+		return;
+	}
+	
+	float2 SampleUV = float2(SceneColorViewport_ViewportMin) * SceneColorViewport_ExtentInverse + CanvasUV;
+	// float2 SampleUV = float2(SceneColorViewport_ViewportMin + (DispatchThreadId + 0.5)) * SceneColorViewport_ExtentInverse;
+	//
+	// // sample OriginalColor
+	float4 SampleColor = OriginalSceneColor.SampleLevel(GlobalPointClampedSampler, SampleUV, 0);
+	//
+	// // To test that everything is working, switch Red and Blue
+	// // float4 OutputColor = float4(SampleColor.z, SampleColor.y, SampleColor.x, SampleColor.w);
+	//
+	// // Write output
+	Output[SceneColorViewport_ViewportMin + DispatchThreadId] = SampleColor;
+}
