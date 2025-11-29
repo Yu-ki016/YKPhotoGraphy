@@ -22,6 +22,10 @@ public:
 	// 当选中了一个可用的Target，不会因为选中其他物体而切换Target
 	UPROPERTY(Category = "Target", EditAnywhere, meta=(DisplayName= "LockTarget"))
 	bool LockTarget = true;
+	
+	// 控制点大小
+	UPROPERTY(Category="Setting", EditAnywhere, meta = (ClampMin = "0", UIMax = "10.0"))
+	float HandleSize = 1.0f;
 };
 
 
@@ -50,6 +54,7 @@ class IPhotoGraphyInteractiveInterface
 public:
 	virtual void UpdateShapeModelFromEditor() = 0;
 	virtual UPhotoGraphyComponent* GetPhotoGraphyComponent() = 0;
+	virtual float GetHandleSize() {return 1.0f;}
 };
 
 UCLASS()
@@ -72,6 +77,7 @@ public:
 	/** IPhotoGraphyInteractiveInterface overrides */
 	virtual void UpdateShapeModelFromEditor() override;
 	virtual UPhotoGraphyComponent* GetPhotoGraphyComponent() override;
+	virtual float GetHandleSize() override;
 
 	void UpdateShapeModelFromComponent(const FPhotoGraphyShapeModel& InShapeModel) const;
 	

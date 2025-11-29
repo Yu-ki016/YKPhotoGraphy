@@ -38,6 +38,7 @@ public:
 	// UPhotoGraphyToolBase* GetPhotoGraphyTool();
 	UPhotoGraphyToolSettings* GetToolSettings() const;
 	UPhotoGraphyComponent* GetPhotoGraphyComponent() const;
+	float GetHandleSize() const;
 
 	virtual void Render(IToolsContextRenderAPI* RenderAPI) override;
 	virtual void DrawHUD(FCanvas* Canvas, IToolsContextRenderAPI* RenderAPI);

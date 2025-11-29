@@ -14,3 +14,4 @@ Plugins/Developer
 *.xcodeproj
 *.xcworkspace
 *.pdb
+*.exp

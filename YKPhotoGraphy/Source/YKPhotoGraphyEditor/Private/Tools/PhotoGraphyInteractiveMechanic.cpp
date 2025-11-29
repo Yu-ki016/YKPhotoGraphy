@@ -83,11 +83,20 @@ UPhotoGraphyToolSettings* UPhotoGraphyInteractiveMechanic::GetToolSettings() con
 
 UPhotoGraphyComponent* UPhotoGraphyInteractiveMechanic::GetPhotoGraphyComponent() const
 {
-	if (IPhotoGraphyInteractiveInterface* InteractiveToll = Cast<IPhotoGraphyInteractiveInterface>(GetParentTool()))
+	if (IPhotoGraphyInteractiveInterface* InteractiveTool = Cast<IPhotoGraphyInteractiveInterface>(GetParentTool()))
 	{
-		return InteractiveToll->GetPhotoGraphyComponent();
+		return InteractiveTool->GetPhotoGraphyComponent();
 	}
 	return nullptr;
+}
+
+float UPhotoGraphyInteractiveMechanic::GetHandleSize() const
+{
+	if (IPhotoGraphyInteractiveInterface* InteractiveTool = Cast<IPhotoGraphyInteractiveInterface>(GetParentTool()))
+	{
+		return InteractiveTool->GetHandleSize();
+	}
+	return 1.0f;
 }
 
 FPhotoGraphyShapeModel UPhotoGraphyInteractiveMechanic::GetShapeModel() const
@@ -114,6 +123,7 @@ void UPhotoGraphyInteractiveMechanic::Render( IToolsContextRenderAPI* RenderAPI 
 	if (!FPhotoGraphyUtils::IsActiveViewport(RenderAPI)) return;
 
 	ToolRenderer.BeginFrame(RenderAPI);
+	ToolHandle->HandleSize = GetHandleSize();
 	ToolHandle->Draw(&ToolRenderer, RenderAPI);
 	ToolRenderer.EndFrame();
 	Super::Render(RenderAPI);

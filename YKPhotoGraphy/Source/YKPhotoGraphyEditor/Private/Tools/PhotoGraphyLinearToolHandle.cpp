@@ -390,7 +390,7 @@ void UPhotoGraphyLinearToolHandle::Draw( FToolDataVisualizer* Renderer, IToolsCo
 
 	DrawRect(Renderer, View, ViewSizeInt);
 
-	float K = FPhotoGraphyUtils::GetFOVFixFactor(View);
+	float K = FPhotoGraphyUtils::GetFOVFixFactor(View) * HandleSize;
 	float Size = K * DiscSize;
 	float HighlightSize = K * HighlightDiscSize;
 	

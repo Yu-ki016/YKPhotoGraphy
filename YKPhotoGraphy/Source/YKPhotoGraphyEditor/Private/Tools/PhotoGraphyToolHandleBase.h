@@ -73,6 +73,7 @@ public:
 	
 	TArray<FPhotoGraphyHandlePoint*> AllHandles;
 	FPhotoGraphyHandlePoint* SelectedHandle = nullptr;
+	float HandleSize = 1.0f;
 	
 	virtual void Initialize(UPhotoGraphyInteractiveMechanic* Mechanic);
 	virtual void UpdateHandlePosition(const FIntPoint InViewSize){}

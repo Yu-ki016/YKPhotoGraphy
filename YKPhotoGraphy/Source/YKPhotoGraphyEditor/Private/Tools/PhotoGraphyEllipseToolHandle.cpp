@@ -214,7 +214,7 @@ void UPhotoGraphyEllipseToolHandle::Draw( FToolDataVisualizer* Renderer, IToolsC
 	DrawEllipses(Renderer, View, ViewCanvas);
 	DrawRect(Renderer, View, ViewSizeInt);
 
-	float K = FPhotoGraphyUtils::GetFOVFixFactor(View);
+	float K = FPhotoGraphyUtils::GetFOVFixFactor(View) * HandleSize;
 	float Size = K * DiscSize;
 	float HighlightSize = K * HighlightDiscSize;
 	

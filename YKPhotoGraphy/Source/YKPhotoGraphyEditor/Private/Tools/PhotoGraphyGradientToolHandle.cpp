@@ -102,7 +102,7 @@ void UPhotoGraphyGradientToolHandle::Draw( FToolDataVisualizer* Renderer, ITools
 
 	DrawLine(Renderer, View, ViewSizeInt);
 
-	float K = FPhotoGraphyUtils::GetFOVFixFactor(View);
+	float K = FPhotoGraphyUtils::GetFOVFixFactor(View) * HandleSize;
 	float TriSize = 0.2f * K;
 
 	for (const FPhotoGraphyHandlePoint* Handle : AllHandles)

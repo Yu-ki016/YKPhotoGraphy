@@ -81,6 +81,11 @@ UPhotoGraphyComponent* UPhotoGraphyInteractiveTool::GetPhotoGraphyComponent()
 	return GetPhotoGraphyProperties()->TargetComponent.Get();
 }
 
+float UPhotoGraphyInteractiveTool::GetHandleSize()
+{
+	return ToolProperties ? ToolProperties->HandleSize : 1.0f;
+}
+
 void UPhotoGraphyInteractiveTool::OnLevelSelectionChanged( UObject* NewSelection ) const
 {
 	UPhotoGraphyInteractiveToolProperties* Properties = GetPhotoGraphyProperties();
