@@ -61,12 +61,38 @@ void UPhotoGraphyComponent::PostInitProperties()
 void UPhotoGraphyComponent::SetShapeModel( const FPhotoGraphyShapeModel& NewModel )
 {
 	if (ShapeModel == NewModel) return;
+
+#if WITH_EDITOR
+
+	static const FName NAME_ShapeModel(TEXT("ShapeModel"));
+	UClass* ComponentClass = GetClass();
+	FProperty* ShapeModelProperty = ComponentClass->FindPropertyByName(NAME_ShapeModel);
+	
+	if (ShapeModelProperty)
+	{
+		Modify();
+		
+		FEditPropertyChain PropertyChain;
+		PropertyChain.AddTail(ShapeModelProperty);
+		PropertyChain.SetActivePropertyNode(ShapeModelProperty);
+		
+		// 广播OnPreObjectPropertyChanged委托，Sequencer会监听这个委托来实现自动k帧
+		FCoreUObjectDelegates::OnPreObjectPropertyChanged.Broadcast(this, PropertyChain);
+	}
+#endif
 	
 	ShapeModel = NewModel;
 	
 #if WITH_EDITOR
-	Modify();
-	MarkPackageDirty();
+	if (ShapeModelProperty)
+	{
+		FPropertyChangedEvent PropertyChangedEvent(ShapeModelProperty, EPropertyChangeType::ValueSet);
+		
+		// 广播OnObjectPropertyChanged委托，Sequencer会监听这个委托来实现自动k帧
+		FCoreUObjectDelegates::OnObjectPropertyChanged.Broadcast(this, PropertyChangedEvent);
+		
+		MarkPackageDirty();
+	}
 #endif
 	
 	if (OnPostShapeModelChanged.IsBound())
