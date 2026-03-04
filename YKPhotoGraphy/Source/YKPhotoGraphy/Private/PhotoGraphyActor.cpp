@@ -35,6 +35,27 @@ void APhotoGraphyActor::Destroyed()
 	Super::Destroyed();
 }
 
+UMaterialInstanceDynamic* APhotoGraphyActor::GetOrCreateDMI()
+{
+	if (!IsValid(PostProcessMaterial))
+	{
+		return nullptr;
+	}
+	
+	if (!IsValid(DMI) || (DMI->Parent != PostProcessMaterial))
+	{
+		DMI = Cast<UMaterialInstanceDynamic>(PostProcessMaterial);
+
+		if (DMI == nullptr)
+		{
+			DMI = UMaterialInstanceDynamic::Create(PostProcessMaterial, this, 
+				MakeUniqueObjectName(this, UMaterialInstanceDynamic::StaticClass(), TEXT("DMI_PhotoGraphy")));
+		}
+	}
+	
+	check(DMI != nullptr);
+	return DMI;
+}
 
 FPostProcessSettings* APhotoGraphyActor::GetPostProcessSettings( AActor* InPostProcessActor )
 {
@@ -60,7 +81,7 @@ void APhotoGraphyActor::BindingToPostProcessActor()
 	if (!PostProcessSettingPtr) return;
 	FPostProcessSettings& PostProcessSetting = *PostProcessSettingPtr;
 
-	DMI = UYKPhotoGraphyBPLibrary::GetOrCreateMID(DMI, TEXT("DMI_PhotoGraphy"), PostProcessMaterial, this);
+	GetOrCreateDMI();
 
 	if (!DMI) return;
 	

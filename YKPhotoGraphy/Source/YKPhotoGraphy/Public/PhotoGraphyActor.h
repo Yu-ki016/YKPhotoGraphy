@@ -100,6 +100,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TSet<TSoftObjectPtr<AActor>> CachedAffectedActors;
 	
+	UMaterialInstanceDynamic* GetOrCreateDMI();
 	static FPostProcessSettings* GetPostProcessSettings(AActor* InPostProcessActor);
 public:
 	// Called every frame

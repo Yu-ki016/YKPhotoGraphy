@@ -21,20 +21,32 @@ void FPhotoGraphySceneViewExtension::SubscribeToPostProcessingPass( EPostProcess
 FScreenPassTexture FPhotoGraphySceneViewExtension::CustomPostProcessing( FRDGBuilder& GraphBuilder,
 	const FSceneView& SceneView, const FPostProcessMaterialInputs& Inputs ) const
 {
+	const FScreenPassTexture& SceneColor = FScreenPassTexture::CopyFromSlice(GraphBuilder, Inputs.GetInput(EPostProcessMaterialInput::SceneColor));
+	check(SceneColor.IsValid());
+	
 	const FSceneViewFamily& ViewFamily = *SceneView.Family;
 	
 	FScreenPassRenderTarget OverrideOutput = Inputs.OverrideOutput;
-	if (!bEnabled)
-	{
-		FScreenPassTextureSlice& SceneColorSlice = const_cast<FScreenPassTextureSlice&>(Inputs.Textures[(uint32)EPostProcessMaterialInput::SceneColor]);
-		return FScreenPassTexture::CopyFromSlice(GraphBuilder, SceneColorSlice, static_cast<FScreenPassTexture>(OverrideOutput));
-	}
 	
-	const FScreenPassTexture& SceneColor = FScreenPassTexture::CopyFromSlice(GraphBuilder, Inputs.GetInput(EPostProcessMaterialInput::SceneColor));
 	if (!OverrideOutput.IsValid())
 	{
 		OverrideOutput = FScreenPassRenderTarget::CreateFromInput(GraphBuilder, SceneColor, SceneView.GetOverwriteLoadAction(), TEXT("PhotoGraphyRenderTarget"));
 	}
+	
+	if (!bEnabled)
+	{
+		FScreenPassTextureSlice& SceneColorSlice = const_cast<FScreenPassTextureSlice&>(Inputs.Textures[(uint32)EPostProcessMaterialInput::SceneColor]);
+		if (OverrideOutput.Texture->Desc.Format != SceneColorSlice.TextureSRV->GetParent()->Desc.Format)
+		{
+			AddDrawTexturePass(GraphBuilder, FScreenPassViewInfo(), SceneColorSlice, OverrideOutput);
+			return OverrideOutput;
+		}
+		else
+		{
+			return FScreenPassTexture::CopyFromSlice(GraphBuilder, SceneColorSlice, OverrideOutput);
+		}
+	}
+	
 	
 	const FScreenPassTextureViewport SceneColorViewport(SceneColor);
 	
