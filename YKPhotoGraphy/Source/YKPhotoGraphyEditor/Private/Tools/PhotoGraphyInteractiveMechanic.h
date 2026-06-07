@@ -24,7 +24,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UPhotoGraphyToolHandleBase> ToolHandle = nullptr;
 	
-	// TWeakObjectPtr<UPhotoGraphyToolBase> PhotoGraphyTool;
+	const FSceneView* LastActiveSceneView = nullptr;
 	
 	bool bIsEnabled = true;
 	bool bDragging = false;

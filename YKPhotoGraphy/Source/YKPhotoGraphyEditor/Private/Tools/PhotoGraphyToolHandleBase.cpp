@@ -55,7 +55,11 @@ const FPhotoGraphyHandlePoint* UPhotoGraphyToolHandleBase::FindHandleByDir(
 bool UPhotoGraphyToolHandleBase::HitTest( const FInputDeviceRay& PressPos )
 {
 	bool bHit = false;
-	const FVector2D MousePos2D = PressPos.ScreenPosition;
+	const FSceneView* View = OwnerMechanic.IsValid() ? OwnerMechanic->LastActiveSceneView : nullptr;
+	if (!View) return  false;
+	
+	FVector2D MousePos2D = PressPos.ScreenPosition;
+	MousePos2D -= View->UnscaledViewRect.Min;
 
 	if (SelectedHandle)
 	{

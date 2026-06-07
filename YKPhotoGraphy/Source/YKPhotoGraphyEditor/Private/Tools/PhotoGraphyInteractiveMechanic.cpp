@@ -120,8 +120,21 @@ void UPhotoGraphyInteractiveMechanic::Render( IToolsContextRenderAPI* RenderAPI 
 {
 	if (!bIsEnabled || !ToolHandle) return;
 
-	if (!FPhotoGraphyUtils::IsActiveViewport(RenderAPI)) return;
+	if (!LastActiveSceneView)
+	{
+		if (EnumHasAnyFlags(RenderAPI->GetViewInteractionState(), EViewInteractionState::Hovered))
+		{
+			LastActiveSceneView = RenderAPI->GetSceneView();
+		}
+	}
+	
+	if (EnumHasAnyFlags(RenderAPI->GetViewInteractionState(), EViewInteractionState::Focused))
+	{
+		LastActiveSceneView = RenderAPI->GetSceneView();
+	}
 
+	if (!LastActiveSceneView || RenderAPI->GetSceneView() != LastActiveSceneView) return;
+	
 	ToolRenderer.BeginFrame(RenderAPI);
 	ToolHandle->HandleSize = GetHandleSize();
 	ToolHandle->Draw(&ToolRenderer, RenderAPI);

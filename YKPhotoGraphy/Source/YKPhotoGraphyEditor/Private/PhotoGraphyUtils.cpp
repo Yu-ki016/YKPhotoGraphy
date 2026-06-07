@@ -170,7 +170,7 @@ FVector FPhotoGraphyUtils::NormalizedUVToWorldPosition( const FSceneView* InView
 	FVector OutPosition = FVector::ZeroVector;
 
 	if (!InView) return OutPosition;
-	const FIntPoint ViewSizeInt = InView->UnconstrainedViewRect.Size();
+	const FIntPoint ViewSizeInt = InView->UnscaledViewRect.Size();
 	const float AspectRationInv = bFixAspect ? static_cast<float>(ViewSizeInt.Y) / ViewSizeInt.X : 1.0f;
 	const FMatrix InvProjectionMatrix	= InView->ViewMatrices.GetInvProjectionMatrix();
 	const FMatrix InvViewMatrix			= InView->ViewMatrices.GetInvViewMatrix();

@@ -384,7 +384,7 @@ void UPhotoGraphyLinearToolHandle::Draw( FToolDataVisualizer* Renderer, IToolsCo
 {
 	const FSceneView* View = RenderAPI->GetSceneView();
 	if (!View) return;
-	const FIntPoint ViewSizeInt = View->UnconstrainedViewRect.Size();
+	const FIntPoint ViewSizeInt = View->UnscaledViewRect.Size();
 	const FVector ViewDirection = View->GetViewDirection();
 	UpdateHandlePosition(ViewSizeInt);
 
@@ -584,12 +584,13 @@ void UPhotoGraphyLinearToolHandle::ProcessBeginDrag( const FInputDeviceRay& Drag
 
 void UPhotoGraphyLinearToolHandle::ProcessDrag( const FInputDeviceRay& DragPos )
 {
-	const FViewport* Viewport = FPhotoGraphyUtils::GetActiveViewport();
-	if (!Viewport) return;
-	const FIntPoint ViewSize = Viewport->GetSizeXY();
+	const FSceneView* View = OwnerMechanic.IsValid() ? OwnerMechanic->LastActiveSceneView : nullptr;
+	if (!View) return;
+	const FIntPoint ViewSize = View->UnscaledViewRect.Size();
 
 	if (!SelectedHandle) return;
-	const FVector2D MousePos2D = DragPos.ScreenPosition;
+	FVector2D MousePos2D = DragPos.ScreenPosition;
+	MousePos2D -= View->UnscaledViewRect.Min;
 
 	FViewCanvas ViewCanvas = FViewCanvas();
 	if (OwnerMechanic.IsValid()) ViewCanvas = OwnerMechanic->GetToolSettings()->GetViewCanvas();
